@@ -20,11 +20,11 @@ class LoginActivity : AppCompatActivity() {
             val username = editTextUsername.text.toString()
             val password = editTextPassword.text.toString()
 
-            // Simples verificação de login
+            // Simple login verification
             if (username == "chef" && password == "password") {
                 Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
                 setResult(RESULT_OK)
-                finish() // Encerra a tela de login
+                finish() // Closes the login screen
             } else {
                 Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show()
             }

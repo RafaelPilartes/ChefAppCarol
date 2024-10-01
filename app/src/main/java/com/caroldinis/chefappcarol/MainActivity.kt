@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
 
-    private var isLoggedIn = false // Estado de login do chef
+    private var isLoggedIn = false // Chef Login State
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -16,18 +16,18 @@ class MainActivity : AppCompatActivity() {
         val listViewMenu: ListView = findViewById(R.id.listViewMenu)
         val buttonAddNewDish: Button = findViewById(R.id.buttonAddNewDish)
         val textViewTotalItems: TextView = findViewById(R.id.textViewTotalItems)
-        val buttonLogin: Button = findViewById(R.id.buttonLogin) // Novo botão de login
+        val buttonLogin: Button = findViewById(R.id.buttonLogin) // New Login Button
 
-        // Configurar botão de login
+        // Configure Login Button
         buttonLogin.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivityForResult(intent, LOGIN_REQUEST_CODE)
         }
 
-        // Exibe o menu e o número total de itens
+        // Displays the menu and total number of items
         updateMenuList(listViewMenu, textViewTotalItems)
 
-        // Navega para a tela de adicionar novo prato
+        // Navigates to the Add New Dish screen
         buttonAddNewDish.setOnClickListener {
             if (isLoggedIn) {
                 val intent = Intent(this, AddMenuItemActivity::class.java)
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Atualiza a lista de menu na tela inicial
+    // Refreshes the menu list on the home screen
     override fun onResume() {
         super.onResume()
         val listViewMenu: ListView = findViewById(R.id.listViewMenu)
@@ -46,24 +46,24 @@ class MainActivity : AppCompatActivity() {
         updateMenuList(listViewMenu, textViewTotalItems)
     }
 
-    // Atualiza a lista de menu e o total de itens
+    // Refreshes the menu list and total number of items
     private fun updateMenuList(listView: ListView, textViewTotalItems: TextView) {
         val menu = MenuData.getMenu()
-        val menuStrings = menu.map { "${it.name} - ${it.course}: \$${it.price}" }
+        val menuStrings = menu.map { "${it.name} - ${it.course}: R${it.price}" }
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, menuStrings)
         listView.adapter = adapter
 
-        // Exibe o número total de itens no menu
+        // Displays the total number of items on the menu
         val totalItems = menu.size
         textViewTotalItems.text = "Total items: $totalItems"
     }
 
-    // Recebe o resultado do LoginActivity
+    // Gets the result of the LoginActivity
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == LOGIN_REQUEST_CODE && resultCode == RESULT_OK) {
             isLoggedIn = true
-            // Atualiza a visibilidade do botão "Add New Dish"
+            // Updates the visibility of the "Add New Dish" button
             val buttonAddNewDish: Button = findViewById(R.id.buttonAddNewDish)
             val buttonLogin: Button = findViewById(R.id.buttonLogin)
             buttonAddNewDish.visibility = Button.VISIBLE

@@ -26,13 +26,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Add New Dish"
-        android:visibility="gone" /> <!-- Inicialmente invisível -->
+        android:visibility="gone" /> <!-- Initially invisible -->
 
     <Button
         android:id="@+id/buttonLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Login" />
+        android:text="Log in to register dishes" />
 
     <ListView
         android:id="@+id/listViewMenu"
