@@ -10,12 +10,43 @@ object MenuData {
         menuList.add(MenuItem("Cheesecake", "Rich cheesecake with strawberry sauce", "Dessert", 6.0))
     }
 
+    // Adds a dish to the list
     fun addDish(dish: MenuItem) {
         menuList.add(dish)
     }
 
-    fun getMenu(): List<MenuItem> {
+    // Removes a dish from the list
+    fun removeDish(dish: MenuItem) {
+        menuList.remove(dish)
+    }
+
+    // Returns the total number of dishes
+    fun getDishes(): List<MenuItem> {
         return menuList
+    }
+
+    // Returns the total number of dishes
+    fun getTotalDishesCount(): Int {
+        return menuList.size
+    }
+
+    fun getDishesByCourse(course: String): List<MenuItem> {
+        return menuList.filter { it.course == course }
+    }
+
+    // Returns a list of courses with their average price (or null if no dishes are in that course)
+    fun getCoursesWithAveragePrices(): List<Pair<String, Double?>> {
+        val courses = listOf("Starter", "Main Course", "Dessert") // Predefined courses
+
+        return courses.map { course ->
+            val courseDishes = menuList.filter { it.course == course }
+            val averagePrice = if (courseDishes.isNotEmpty()) {
+                courseDishes.sumOf { it.price } / courseDishes.size
+            } else {
+                null
+            }
+            course to averagePrice
+        }
     }
 }
 

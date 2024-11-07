@@ -1,5 +1,6 @@
 package com.caroldinis.chefappcarol
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.*
@@ -14,13 +15,13 @@ class AddMenuItemActivity : AppCompatActivity() {
         // Referencing UI Elements
         val editTextDishName: EditText = findViewById(R.id.editTextDishName)
         val editTextDishDescription: EditText = findViewById(R.id.editTextDishDescription)
-        val spinnerCourse: Spinner = findViewById(R.id.spinnerCourse)
         val editTextDishPrice: EditText = findViewById(R.id.editTextDishPrice)
+        val spinnerCourse: Spinner = findViewById(R.id.spinnerCourse)
         val buttonAddDish: Button = findViewById(R.id.buttonAddDish)
 
         // Setting course options in the spinner
-        val courses = arrayOf("Starter", "Main Course", "Dessert")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, courses)
+        val selectedCourse = intent.getStringExtra("selected_course") ?: "Starter"
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listOf(selectedCourse))
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCourse.adapter = adapter
 
@@ -28,13 +29,12 @@ class AddMenuItemActivity : AppCompatActivity() {
         buttonAddDish.setOnClickListener {
             val dishName = editTextDishName.text.toString()
             val dishDescription = editTextDishDescription.text.toString()
-            val course = spinnerCourse.selectedItem.toString()
             val dishPrice = editTextDishPrice.text.toString().toDoubleOrNull()
 
             // Simple validation
             if (dishName.isNotEmpty() && dishDescription.isNotEmpty() && dishPrice != null) {
                 // Saving the dish to the menu (using a temporary list or database)
-                MenuData.addDish(MenuItem(dishName, dishDescription, course, dishPrice))
+                MenuData.addDish(MenuItem(dishName, dishDescription, selectedCourse, dishPrice))
 
                 // Displaying a confirmation message
                 Toast.makeText(this, "$dishName added to menu!", Toast.LENGTH_SHORT).show()
@@ -43,6 +43,9 @@ class AddMenuItemActivity : AppCompatActivity() {
                 editTextDishName.text.clear()
                 editTextDishDescription.text.clear()
                 editTextDishPrice.text.clear()
+
+                setResult(Activity.RESULT_OK) // Trigger update in CourseDetailActivity
+                finish()
             } else {
                 Toast.makeText(this, "Please fill all fields!", Toast.LENGTH_SHORT).show()
             }

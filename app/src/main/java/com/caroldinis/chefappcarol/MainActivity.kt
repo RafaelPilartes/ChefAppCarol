@@ -1,22 +1,25 @@
 package com.caroldinis.chefappcarol
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 
+@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
 
     private var isLoggedIn = false // Chef Login State
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val listViewMenu: ListView = findViewById(R.id.listViewMenu)
-        val buttonAddNewDish: Button = findViewById(R.id.buttonAddNewDish)
+        val listViewCourses: ListView = findViewById(R.id.listViewCourses)
+        val buttonLogin: Button = findViewById(R.id.buttonLogin)
+
         val textViewTotalItems: TextView = findViewById(R.id.textViewTotalItems)
-        val buttonLogin: Button = findViewById(R.id.buttonLogin) // New Login Button
 
         // Configure Login Button
         buttonLogin.setOnClickListener {
@@ -24,51 +27,50 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(intent, LOGIN_REQUEST_CODE)
         }
 
-        // Displays the menu and total number of items
-        updateMenuList(listViewMenu, textViewTotalItems)
+        // Display courses and average prices
+        updateCourseList(listViewCourses, textViewTotalItems)
 
-        // Navigates to the Add New Dish screen
-        buttonAddNewDish.setOnClickListener {
-            if (isLoggedIn) {
-                val intent = Intent(this, AddMenuItemActivity::class.java)
-                startActivity(intent)
-            } else {
-                Toast.makeText(this, "Please log in to add a dish.", Toast.LENGTH_SHORT).show()
-            }
+        listViewCourses.setOnItemClickListener { _, _, position, _ ->
+            val course = MenuData.getCoursesWithAveragePrices()[position].first
+            val intent = Intent(this, CourseDetailActivity::class.java)
+            intent.putExtra("course", course)
+            intent.putExtra("isLoggedIn", isLoggedIn)
+            startActivity(intent)
         }
     }
 
-    // Refreshes the menu list on the home screen
+    // Refresh the course list and total items each time the activity resumes
     override fun onResume() {
         super.onResume()
-        val listViewMenu: ListView = findViewById(R.id.listViewMenu)
+        val listViewCourses: ListView = findViewById(R.id.listViewCourses)
         val textViewTotalItems: TextView = findViewById(R.id.textViewTotalItems)
-        updateMenuList(listViewMenu, textViewTotalItems)
+        updateCourseList(listViewCourses, textViewTotalItems)
     }
 
-    // Refreshes the menu list and total number of items
-    private fun updateMenuList(listView: ListView, textViewTotalItems: TextView) {
-        val menu = MenuData.getMenu()
-        val menuStrings = menu.map { "${it.name} - ${it.course}: R${it.price}" }
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, menuStrings)
-        listView.adapter = adapter
-
-        // Displays the total number of items on the menu
-        val totalItems = menu.size
-        textViewTotalItems.text = "Total items: $totalItems"
-    }
-
-    // Gets the result of the LoginActivity
+    // Update UI after login
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == LOGIN_REQUEST_CODE && resultCode == RESULT_OK) {
             isLoggedIn = true
-            // Updates the visibility of the "Add New Dish" button
-            val buttonAddNewDish: Button = findViewById(R.id.buttonAddNewDish)
-            val buttonLogin: Button = findViewById(R.id.buttonLogin)
-            buttonAddNewDish.visibility = Button.VISIBLE
-            buttonLogin.visibility = Button.GONE
+            findViewById<Button>(R.id.buttonLogin).visibility = Button.GONE
         }
+    }
+
+    // Show courses with average prices and update total items count
+    private fun updateCourseList(listView: ListView, textViewTotalItems: TextView) {
+        val coursesWithAverages = MenuData.getCoursesWithAveragePrices()
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_list_item_1,
+            coursesWithAverages.map { (course, averagePrice) ->
+                "$course - Avg Price: ${averagePrice?.let { "$%.2f".format(it) } ?: "N/A"}"
+            }
+        )
+        listView.adapter = adapter
+
+        // Update total items count
+        val totalItems = MenuData.getTotalDishesCount()
+        textViewTotalItems.text = "Total items: $totalItems"
     }
 
     companion object {
